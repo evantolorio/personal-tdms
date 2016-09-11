@@ -1,0 +1,46 @@
+html{
+    font-size: 1.1rem;
+    font-weight: 300;
+}
+
+nav{
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+table thead{
+    font-weight: 400;
+}
+
+.caption{
+    font-weight: 300;
+}
+
+.material-icons.not-btn:hover{
+    cursor: pointer;
+    color: #1E88E5;
+}
+
+.collection-header h5, .modal h4{
+    font-weight:300;
+}
+
+.collection-header h5 i{
+    cursor: pointer;
+}
+
+.collection-item p{
+    color:rgba(0,0,0,0.71);
+}
+
+span.title{
+    font-size:1rem !important;
+}
+
+.partner-collections span.title{
+    font-weight: 500;
+}
+
+#add-partner-modal, #edit-partner-modal{
+    width:35%;
+}

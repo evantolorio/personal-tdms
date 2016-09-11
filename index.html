@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<!--
+    Author: Evan Norman A. Tolorio
+        evantolorio@gmail.com, eatolorio@up.edu.ph
+
+    Description: This program aims to give a dashboard for the
+        Ten Days missionercto manage their Ten Days mission
+        support and also for their Prayer partners
+ -->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>TDMS Dashboard</title>
+
+        <!-- Style sheets -->
+        <link href="css/icon.css" rel="stylesheet" type="text/css">
+        <link href="css/materialize.min.css" rel="stylesheet" type="text/css">
+        <link href="css/style.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <!-- Navigation Bar -->
+        <div class="navbar-fixed">
+            <nav class="blue darken-1">
+                <div class="nav-wrapper container">
+                    <a href="">
+                        <h5>
+                          Personal TDMS Dashboard
+                          <span class="right">
+                            {{ name }}
+                          </span>
+                        </h5>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div class="container">
+            <div class="row" style="padding-top:1.5em;">
+                <div class="col s12">
+                    <h5 class="caption">
+                        Manage your Ten Days mission support ({{ nation }}).
+
+                        <!-- Toggle settings -->
+                        <i class="material-icons right not-btn"
+                            style="font-size:1.7rem;"
+                            @click.prevent="toggleSettings"
+                        >
+                            settings
+                        </i>
+
+                        <!-- Download data.json file -->
+                        <i class="material-icons right not-btn"
+                            style="font-size:1.7rem;"
+                            @click.prevent="saveData"
+                        >
+                            archive
+                        </i>
+                    </h5>
+                </div>
+
+                <div class="col s12" v-show="showSettings">
+                    <a id="download-file" style="display:none"></a>
+                    <div class="row">
+                        <!-- Legend -->
+                        <div class="col s4 left">
+                            <ul class="collection with-header">
+                                <li class="collection-header blue darken-2">
+                                    <h5 class="white-text">
+                                        Legend
+                                    </h5>
+                                </li>
+                                <li class="collection-item avatar">
+                                    <i class="material-icons circle" style="font-size:1.4rem;">
+                                        face
+                                    </i>
+                                    <span class="title">No decision yet</span>
+                                </li>
+                                <li class="collection-item avatar">
+                                    <i class="material-icons circle green lighten-1" style="font-size:1.4rem;">
+                                        face
+                                    </i>
+                                    <span class="title">Accepted partnership</span>
+                                </li>
+                                <li class="collection-item avatar">
+                                    <i class="material-icons circle red lighten-1" style="font-size:1.4rem;">
+                                        face
+                                    </i>
+                                    <span class="title">Declined partnership</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Settings container -->
+                        <div class="col s3 right">
+                            <div class="input-field col s12">
+                                <input type="text" id="input-name" v-model="inputName">
+                                <label for="input-name">Name</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input type="text" id="input-nation" v-model="inputNation">
+                                <label for="input-nation">Nation</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input type="text" id="input-amount" v-model="inputAmount">
+                                <label for="input-amount">Total Amount</label>
+                            </div>
+                            <a href="#"
+                                class="btn btn-medium waves-effect waves-light blue darken-4 col s6 right"
+                                @click.prevent="saveSettings"
+                            >
+                                Save
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+            <div class="row">
+                <div class="col s8 offset-s2 center-align z-depth-1" style="padding:1.2rem;">
+                    <span class="green-text text-darken-3" style="font-style:italic;">
+                        "Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the
+                        Son and of the Holy Spirit, teaching them to observe all that I have commanded you. And behold,
+                        I am with you always, to the end of the age." - Matt. 28:19-20
+                    </span>
+                </div>
+            </div>
+
+            <!-- Input Field, Add partner -->
+            <div class="row">
+                <div class="col s3">
+                    <div class="card">
+                        <div class="card-content teal white-text center-align">
+                            <span class="card-title">
+                                Pledge
+                            </span>
+                            <h3>{{ pledgePercentage }}%</h3>
+                        </div>
+                        <div class="card-action teal center-align">
+                            {{ pledgeNumeric | toPesos }} / {{ totalAmount | toPesos }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col s3">
+                    <div class="card">
+                        <div class="card-content teal white-text center-align">
+                            <span class="card-title">
+                                Remitted
+                            </span>
+                            <h3>{{ remittedPercentage }}%</h3>
+                        </div>
+                        <div class="card-action teal center-align">
+                            {{ remittedNumeric | toPesos }} / {{ totalAmount | toPesos }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col s3">
+                    <div class="card">
+                        <div class="card-content teal white-text center-align">
+                            <span class="card-title">
+                                Pledge + Remitted
+                            </span>
+                            <h3>{{ totalPercentage }}%</h3>
+                        </div>
+                        <div class="card-action teal center-align">
+                            {{ totalNumeric | toPesos }} / {{ totalAmount | toPesos }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col s3">
+                    <div class="card">
+                        <div class="card-content teal white-text center-align">
+                            <span class="card-title">
+                                Partnered
+                            </span>
+                            <h3> {{ peoplePartnered }} / {{ potentialPartners }}</h3>
+                        </div>
+                        <div class="card-action teal center-align">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collections -->
+            <div class="row partner-collections">
+
+                <!-- Most Likely Collection -->
+                <div class="col s4">
+                    <ul class="collection with-header">
+                        <li class="collection-header green darken-1">
+                            <h5 class="white-text">
+                                Most Likely ({{ mostLikelyPartners.length }})
+                                <i class="material-icons right tooltipped"
+                                    data-position="top"
+                                    data-delay="50"
+                                    data-html="true"
+                                    data-tooltip="Add 'Most Likely' to support Partner"
+                                    @click.prevent="promptAddModal('most_likely')"
+                                >
+                                    person_add
+                                </i>
+                            </h5>
+                        </li>
+                        <li class="collection-item avatar" v-for="partner in mostLikelyPartners">
+                            <i class="material-icons circle"
+                                :class="{'green lighten-1': partner.status == 'partnered', 'red lighten-1': partner.status == 'declined'}"
+                                style="font-size:1.4rem;"
+                            >
+                                face
+                            </i>
+                            <span class="title">{{ partner.name }}</span>
+                            <!-- <p>{{ partner.asked | transformDate }} <br> -->
+                            <p>
+                               {{ partner.givenAmount | toPesos }} / {{ partner.intendedAmount | toPesos }}
+                            </p>
+                            <a href="#!"
+                                class="secondary-content"
+                                @click.prevent="promptEditModal('most_likely',partner.name)"
+                            >
+                                <i class="material-icons">edit</i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Likely Collection -->
+                <div class="col s4">
+                    <ul class="collection with-header">
+                        <li class="collection-header light-green darken-1">
+                            <h5 class="white-text">
+                                Likely ({{ likelyPartners.length }})
+                                <i class="material-icons right tooltipped"
+                                    data-position="top"
+                                    data-delay="50"
+                                    data-tooltip="Add 'Likely to support' Partner"
+                                    @click.prevent="promptAddModal('likely')"
+                                >
+                                    person_add
+                                </i>
+                            </h5>
+                        </li>
+                        <li class="collection-item avatar" v-for="partner in likelyPartners">
+                            <i class="material-icons circle"
+                                :class="{'green lighten-1': partner.status == 'partnered', 'red lighten-1': partner.status == 'declined'}"
+                                style="font-size:1.4rem;"
+                                >
+                                    face
+                                </i>
+                            <span class="title">{{ partner.name }}</span>
+                            <!-- <p>{{ partner.asked | transformDate }} <br> -->
+                            <p>
+                               {{ partner.givenAmount | toPesos }} / {{ partner.intendedAmount | toPesos }}
+                            </p>
+                            <a href="#"
+                                class="secondary-content"
+                                @click.prevent="promptEditModal('likely',partner.name)"
+                            >
+                                <i class="material-icons">edit</i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Less Likely Collection -->
+                <div class="col s4">
+                    <ul class="collection with-header">
+                        <li class="collection-header lime darken-1">
+                            <h5 class="white-text">
+                                Less Likely ({{ lessLikelyPartners.length }})
+                                <i class="material-icons right tooltipped"
+                                    data-position="top"
+                                    data-delay="50"
+                                    data-tooltip="Add 'Less Likely to support' Partner"
+                                    @click.prevent="promptAddModal('less_likely')"
+                                >
+                                    person_add
+                                </i>
+                            </h5>
+                        </li>
+                        <li class="collection-item avatar" v-for="partner in lessLikelyPartners">
+                            <i class="material-icons circle"
+                                :class="{'green lighten-1': partner.status == 'partnered', 'red lighten-1': partner.status == 'declined'}"
+                                style="font-size:1.4rem;"
+                            >
+                                face
+                            </i>
+                            <span class="title">{{ partner.name }}</span>
+                            <!-- <p>{{ partner.asked | transformDate }} <br> -->
+                            <p>
+                               {{ partner.givenAmount | toPesos }} / {{ partner.intendedAmount | toPesos }}
+                            </p>
+                            <a href="#!"
+                                class="secondary-content"
+                                @click.prevent="promptEditModal('less_likely',partner.name)"
+                            >
+                                <i class="material-icons">edit</i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Partner Modal -->
+        <div id="add-partner-modal" class="modal modal-fixed-footer">
+            <div class="modal-content">
+                <h4>
+                    Add Partner
+                    <i class="material-icons not-btn tooltipped"
+                        style="font-size:1.7rem;"
+                        data-position="top"
+                        data-delay="50"
+                        data-tooltip="You can leave the amount fields blank to indicate no amount"
+                    >
+                        info_outline
+                    </i>
+                    <i class="material-icons modal-action modal-close right">close</i>
+                </h4>
+
+                <!-- Name Field -->
+                <div class="row" style="margin-bottom:0px;">
+                    <div class="input-field col s6">
+                        <input type="text" id="partner" v-model="addPartnerInfo.nameField">
+                        <label for="partner">Name</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Given Amount Field -->
+                    <div class="input-field col s6">
+                        <input type="text" id="givenAmount" v-model="addPartnerInfo.givenAmountField">
+                        <label for="givenAmount">Given Amount</label>
+                    </div>
+
+                    <!-- Intended Amount Field -->
+                    <div class="input-field col s6">
+                        <input type="text" id="intendedAmount" v-model="addPartnerInfo.intendedAmountField">
+                        <label for="intendedAmount">Intended Amount</label>
+                    </div>
+
+                    <!-- Category Field -->
+                    <div class="input-field col s6">
+                        <span>Category</span><br>
+                        <input type="radio" id="most-likely" class="with-gap" value="most_likely" v-model="addPartnerInfo.categoryField">
+                        <label for="most-likely">Most Likely</label>
+                        <br>
+                        <input type="radio" id="likely" class="with-gap" value="likely" v-model="addPartnerInfo.categoryField">
+                        <label for="likely">Likely</label>
+                        <br>
+                        <input type="radio" id="less-likely" class="with-gap" value="less_likely" v-model="addPartnerInfo.categoryField">
+                        <label for="less-likely">Less Likely</label>
+                    </div>
+
+                    <!-- Status Field -->
+                    <div class="input-field col s6">
+                        <span>Status</span><br>
+                        <input type="radio" id="none" class="with-gap" value="not_yet" v-model="addPartnerInfo.statusField">
+                        <label for="none">No decision yet</label>
+                        <br>
+                        <input type="radio" id="partnered" class="with-gap" value="partnered" v-model="addPartnerInfo.statusField">
+                        <label for="partnered">Partnered</label>
+                        <br>
+                        <input type="radio" id="declined" class="with-gap" value="declined" v-model="addPartnerInfo.statusField">
+                        <label for="declined">Declined</label>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <!-- Remarks Field -->
+                    <div class="input-field col s12">
+                        <textarea id="remarks" class="materialize-textarea" length="150" v-model="addPartnerInfo.remarksField"></textarea>
+                        <label for="remark">Remarks</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#"
+                    class="btn btn-medium waves-effect waves-light blue darken-4"
+                    @click.prevent="addPartner"
+                >
+                    Add<i class="material-icons left">person_add</i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Edit Partner Modal -->
+        <div id="edit-partner-modal" class="modal modal-fixed-footer">
+            <div class="modal-content">
+                <h4>
+                    Edit {{ editPartnerInfo.name }}
+                    <i class="material-icons modal-action modal-close right">close</i>
+                </h4>
+
+                <!-- Name Field -->
+                <div class="row" style="margin-bottom:0px;">
+                    <div class="input-field col s6">
+                        <input type="text" id="edit-partner" v-model="editPartnerInfo.nameField">
+                        <label for="edit-partner">Name</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Given Amount Field -->
+                    <div class="input-field col s6">
+                        <input type="text" id="edit-givenAmount" v-model="editPartnerInfo.givenAmountField">
+                        <label for="edit-givenAmount">Given Amount</label>
+                    </div>
+
+                    <!-- Intended Amount Field -->
+                    <div class="input-field col s6">
+                        <input type="text" id="edit-intendedAmount" v-model="editPartnerInfo.intendedAmountField">
+                        <label for="edit-intendedAmount">Intended Amount</label>
+                    </div>
+
+                    <!-- Category Field -->
+                    <div class="input-field col s6">
+                        <span>Category</span><br>
+                        <input type="radio" id="edit-most-likely" class="with-gap" value="most_likely" v-model="editPartnerInfo.categoryField">
+                        <label for="edit-most-likely">Most Likely</label>
+                        <br>
+                        <input type="radio" id="edit-likely" class="with-gap" value="likely" v-model="editPartnerInfo.categoryField">
+                        <label for="edit-likely">Likely</label>
+                        <br>
+                        <input type="radio" id="edit-less-likely" class="with-gap" value="less_likely" v-model="editPartnerInfo.categoryField">
+                        <label for="edit-less-likely">Less Likely</label>
+                    </div>
+
+                    <!-- Status Field -->
+                    <div class="input-field col s6">
+                        <span>Status</span><br>
+                        <input type="radio" id="edit-none" class="with-gap" value="not_yet" v-model="editPartnerInfo.statusField">
+                        <label for="edit-none">No decision yet</label>
+                        <br>
+                        <input type="radio" id="edit-partnered" class="with-gap" value="partnered" v-model="editPartnerInfo.statusField">
+                        <label for="edit-partnered">Partnered</label>
+                        <br>
+                        <input type="radio" id="edit-declined" class="with-gap" value="declined" v-model="editPartnerInfo.statusField">
+                        <label for="edit-declined">Declined</label>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <!-- Remarks Field -->
+                    <div class="input-field col s12">
+                        <textarea id="edit-remarks" class="materialize-textarea" length="150" v-model="editPartnerInfo.remarksField"></textarea>
+                        <label for="edit-remarks">Remarks</label>
+                    </div>
+                </div>
+
+                <!-- <div class="row">
+                    <br>
+
+                </div> -->
+            </div>
+            <div class="modal-footer">
+                <div id="edit-modal-buttons">
+                    <a href="#"
+                        class="btn btn-medium waves-effect waves-light blue darken-4"
+                        style="margin-left:1rem;"
+                        @click.prevent="editPartner"
+                    >
+                        Edit<i class="material-icons left">edit</i>
+                    </a>
+
+                    <a href="#"
+                        class="btn btn-medium waves-effect waves-light grey darken-1"
+                        @click.prevent="promptDeleteModal"
+                    >
+                        Delete<i class="material-icons left">delete</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Partner Confirmation Modal -->
+        <div id="delete-partner-confirmation-modal" class="modal">
+            <div class="modal-content">
+                <h4>Delete Partner Confirmation</h4>
+                <p>
+                    Are you sure you want to remove {{ editPartnerInfo.name }} from your list?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <a class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
+                <a class="modal-action waves-effect waves-green btn-flat" @click.prevent="deletePartner">Yes</a>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="js/vendor/lodash.js" charset="utf-8"></script>
+        <script src="js/vendor/VueJS/vue.js" charset="utf-8"></script>
+        <script src="js/vendor/jquery.min.js" charset="utf-8"></script>
+        <script src="js/vendor/materialize.min.js" charset="utf-8"></script>
+        <script src="js/init.js" charset="utf-8"></script>
+        <script src="js/dashboard.js" charset="utf-8"></script>
+    </body>
+</html>
