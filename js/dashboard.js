@@ -21,7 +21,7 @@ Vue.filter('transformDate', function(value){
 });
 
 new Vue({
-    el: 'body',
+    el: '#body-container',
     data:{
         showSettings: false,
         counter: 1,
@@ -192,7 +192,7 @@ new Vue({
 
         // Prompt Add Partner modal
         promptAddModal: function(category){
-            $('#add-partner-modal').openModal();
+            $('#add-partner-modal').modal('open');
             this.addPartnerInfo.categoryField = category;
             this.addPartnerInfo.statusField = 'not_yet';
         },
@@ -249,7 +249,7 @@ new Vue({
             this.editPartnerInfo.remarksField = this.partners[index].remarks;
 
             $("label[for='edit-partner'], label[for='edit-intendedAmount'], label[for='edit-givenAmount'], label[for='edit-remarks']").addClass('active');
-            $('#edit-partner-modal').openModal();
+            $('#edit-partner-modal').modal('open');
         },
 
         // Update data on partner
@@ -269,7 +269,7 @@ new Vue({
             this.partners[index].status = this.editPartnerInfo.statusField;
             this.partners[index].remarks = this.editPartnerInfo.remarksField;
 
-            $('#edit-partner-modal').closeModal();
+            $('#edit-partner-modal').modal('close');
             Materialize.toast(this.editPartnerInfo.nameField + ' edited',2500);
 
             // Store to window.localStorage for backup purposes
@@ -278,7 +278,7 @@ new Vue({
 
         // Prompt Delete Partner confirmation modal
         promptDeleteModal: function(){
-            $('#delete-partner-confirmation-modal').openModal();
+            $('#delete-partner-confirmation-modal').modal('open');
         },
 
         // Delete partner from list
@@ -286,8 +286,8 @@ new Vue({
             var partner = this.partners[this.editPartnerInfo.index];
             this.partners.$remove(partner);
 
-            $('#delete-partner-confirmation-modal').closeModal();
-            $('#edit-partner-modal').closeModal();
+            $('#delete-partner-confirmation-modal').modal('close');
+            $('#edit-partner-modal').modal('close');
             Materialize.toast(this.editPartnerInfo.nameField + ' removed from your list',2500);
 
             // Store to window.localStorage for backup purposes
